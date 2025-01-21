@@ -68,21 +68,29 @@ workflow CREATETAXDB {
                 fasta_dna
             }
 
-        ch_dna_for_unzipping = ch_dna_refs_for_singleref.branch { _meta, fasta ->
+        // Just as a temp measure we can force that either all are zipped or all are unzipped, that doesn't seem unreasonable for such a large gain in performance
+        ch_dna_for_concatenating = ch_dna_refs_for_singleref.branch { _meta, fasta ->
             zipped: fasta.extension == 'gz'
             unzipped: true
         }
 
-        GUNZIP_DNA(ch_dna_for_unzipping.zipped)
-        ch_prepped_dna_fastas_ungrouped = GUNZIP_DNA.out.gunzip.mix(ch_dna_for_unzipping.unzipped)
-        ch_prepped_dna_fastas = ch_prepped_dna_fastas_ungrouped.map { _meta, fasta -> [[id: params.dbname], fasta] }.groupTuple()
-        ch_versions = ch_versions.mix(GUNZIP_DNA.out.versions.first())
-
         // Place in single file
-        CAT_CAT_DNA(ch_prepped_dna_fastas)
+        CAT_CAT_DNA(ch_dna_for_concatenating.zipped.map { _meta, fasta -> [[id: params.dbname], fasta] }.groupTuple())
         ch_versions = ch_versions.mix(CAT_CAT_DNA.out.versions.first())
-        ch_singleref_for_dna = CAT_CAT_DNA.out.file_out
-    }
+
+        GUNZIP_DNA(CAT_CAT_DNA.out.file_out)
+
+        ch_versions = ch_versions.mix(GUNZIP_DNA.out.versions.first())
+        ch_singleref_for_dna = GUNZIP_DNA.out.gunzip
+
+        // ch_prepped_dna_fastas_ungrouped = GUNZIP_DNA.out.gunzip.mix(ch_dna_for_unzipping.unzipped)
+        // ch_prepped_dna_fastas = ch_prepped_dna_fastas_ungrouped.map { _meta, fasta -> [[id: params.dbname], fasta] }.groupTuple()
+    //     ch_versions = ch_versions.mix(GUNZIP_DNA.out.versions.first())
+
+    //     CAT_CAT_DNA(ch_prepped_dna_fastas)
+    //     ch_versions = ch_versions.mix(CAT_CAT_DNA.out.versions.first())
+    //     ch_singleref_for_dna = CAT_CAT_DNA.out.file_out
+    // }
 
     // TODO: Possibly need to have a modification step to get header correct to actually run with kaiju...
     // TEST first!
