@@ -90,7 +90,7 @@ workflow CREATETAXDB {
     //     CAT_CAT_DNA(ch_prepped_dna_fastas)
     //     ch_versions = ch_versions.mix(CAT_CAT_DNA.out.versions.first())
     //     ch_singleref_for_dna = CAT_CAT_DNA.out.file_out
-    // }
+    }
 
     // TODO: Possibly need to have a modification step to get header correct to actually run with kaiju...
     // TEST first!
