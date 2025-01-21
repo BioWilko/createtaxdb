@@ -34,7 +34,7 @@ workflow {
         params.monochrome_logs,
         args,
         params.outdir,
-        params.input
+        params.input,
     )
 
     //
@@ -53,7 +53,7 @@ workflow {
         params.outdir,
         params.monochrome_logs,
         params.hook_url,
-        NFCORE_CREATETAXDB.out.multiqc_report
+        NFCORE_CREATETAXDB.out.multiqc_report,
     )
 }
 
@@ -79,9 +79,9 @@ workflow NFCORE_CREATETAXDB {
     ch_taxonomy_namesdmp = file(params.namesdmp, checkIfExists: true)
     ch_taxonomy_nodesdmp = file(params.nodesdmp, checkIfExists: true)
     ch_accession2taxid = file(params.accession2taxid, checkIfExists: true)
-    ch_nucl2taxid = file(params.nucl2taxid, checkIfExists: true)
-    ch_prot2taxid = file(params.prot2taxid, checkIfExists: true)
-    ch_malt_mapdb = file(params.malt_mapdb, checkIfExists: true)
+    ch_nucl2taxid = file(params.nucl2taxid)
+    ch_prot2taxid = file(params.prot2taxid)
+    ch_malt_mapdb = file(params.malt_mapdb)
 
 
     CREATETAXDB(
@@ -91,7 +91,7 @@ workflow NFCORE_CREATETAXDB {
         ch_accession2taxid,
         ch_nucl2taxid,
         ch_prot2taxid,
-        ch_malt_mapdb
+        ch_malt_mapdb,
     )
 
     emit:
